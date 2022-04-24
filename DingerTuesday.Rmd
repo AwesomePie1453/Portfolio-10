@@ -1,0 +1,71 @@
+---
+title: "Dinger Tuesday Prediction"
+author: "AwesomePie1453"
+date: "4/24/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduction
+
+Fanduel Sportsbook does a promotion every Tuesday called Dinger Tuesday. Bet $25 on a player to hit a HR, get $5 in bonus funds for every HR hit in that game. You can do it once per game. In this portfolio, I want to try and create a model (probably just using a function, since I dont know machine learning yet) that will allow me to calculate the games that are the most likely to have the highest amount of home runs. We are going to try and start with using starting pitcher's HRX9, opposing HR rank, Bullpen rank, Park factors, Humidity, and wind.
+
+## HR x 9
+
+To do this, we are going to try and webscrape baseball reference. 
+
+```{r load}
+library(tidyverse)
+library(rvest)
+library(skimr)
+library(robotstxt)
+```
+
+```{r}
+paths_allowed("www.baseball-reference.com")
+```
+
+```{r}
+Gerrit_Cole <- read_html("https://www.baseball-reference.com/players/c/colege01.shtml")
+typeof(Gerrit_Cole)
+```
+
+```{r}
+year <- Gerrit_Cole %>%
+  html_nodes(".full th") %>%
+  html_text()
+year
+```
+
+```{r}
+Team <- Gerrit_Cole %>%
+  html_nodes("#pitching_standard .right+ .left") %>%
+  html_text()
+Team
+```
+
+```{r}
+ERA <- Gerrit_Cole %>%
+  html_nodes(".right.poptip:nth-child(8)") %>%
+  html_text()
+ERA
+```
+
+```{r}
+IP <- Gerrit_Cole %>%
+  html_nodes(".full .poptip.iz+ .right") %>%
+  html_text()
+IP
+```
+
+```{r}
+GerritCole <- tibble(
+  year = year,
+  ERA = ERA,
+  Innings_Pitched = IP 
+)
+```
+
