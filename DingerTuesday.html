@@ -207,35 +207,226 @@ typeof(Gerrit_Cole)</code></pre>
   html_text()
 year</code></pre>
 <pre><code>##  [1] &quot;2013&quot; &quot;2014&quot; &quot;2015&quot; &quot;2016&quot; &quot;2017&quot; &quot;2018&quot; &quot;2019&quot; &quot;2020&quot; &quot;2021&quot; &quot;2022&quot;</code></pre>
-<pre class="r"><code>Team &lt;- Gerrit_Cole %&gt;%
-  html_nodes(&quot;#pitching_standard .right+ .left&quot;) %&gt;%
-  html_text()
-Team</code></pre>
-<pre><code>##  [1] &quot;PIT-min&quot;         &quot;PIT-min&quot;         &quot;PIT&quot;             &quot;&quot;               
-##  [5] &quot;PIT-min&quot;         &quot;PIT&quot;             &quot;&quot;                &quot;PIT&quot;            
-##  [9] &quot;AS,CYA-4,MVP-19&quot; &quot;PIT-min&quot;         &quot;PIT&quot;             &quot;&quot;               
-## [13] &quot;PIT&quot;             &quot;&quot;                &quot;HOU&quot;             &quot;AS,CYA-5&quot;       
-## [17] &quot;HOU&quot;             &quot;AS,CYA-2,MVP-10&quot; &quot;NYY&quot;             &quot;CYA-4&quot;          
-## [21] &quot;NYY&quot;             &quot;AS,CYA-2,MVP-15&quot; &quot;NYY&quot;             &quot;&quot;               
-## [25] &quot;&quot;                &quot;&quot;                &quot;&quot;                &quot;&quot;               
-## [29] &quot;&quot;                &quot;&quot;                &quot;&quot;                &quot;&quot;               
-## [33] &quot;&quot;</code></pre>
 <pre class="r"><code>ERA &lt;- Gerrit_Cole %&gt;%
   html_nodes(&quot;.right.poptip:nth-child(8)&quot;) %&gt;%
   html_text()
 ERA</code></pre>
-<pre><code>##  [1] &quot;3.22&quot; &quot;3.65&quot; &quot;2.60&quot; &quot;3.88&quot; &quot;4.26&quot; &quot;2.88&quot; &quot;2.50&quot; &quot;2.84&quot; &quot;3.23&quot; &quot;6.35&quot;</code></pre>
+<pre><code>##  [1] &quot;3.22&quot; &quot;3.65&quot; &quot;2.60&quot; &quot;3.88&quot; &quot;4.26&quot; &quot;2.88&quot; &quot;2.50&quot; &quot;2.84&quot; &quot;3.23&quot; &quot;4.00&quot;</code></pre>
 <pre class="r"><code>IP &lt;- Gerrit_Cole %&gt;%
   html_nodes(&quot;.full .poptip.iz+ .right&quot;) %&gt;%
   html_text()
 IP</code></pre>
 <pre><code>##  [1] &quot;117.1&quot; &quot;138.0&quot; &quot;208.0&quot; &quot;116.0&quot; &quot;203.0&quot; &quot;200.1&quot; &quot;212.1&quot; &quot;73.0&quot;  &quot;181.1&quot;
-## [10] &quot;11.1&quot;</code></pre>
+## [10] &quot;18.0&quot;</code></pre>
 <pre class="r"><code>GerritCole &lt;- tibble(
   year = year,
   ERA = ERA,
   Innings_Pitched = IP 
 )</code></pre>
+<p>Comparing to just using the sheet</p>
+<pre class="r"><code>read_csv(&quot;Gerrit Cole Stats.csv&quot;)</code></pre>
+<pre><code>## Rows: 19 Columns: 35
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (4): Year, Tm, Lg, Awards
+## dbl (31): Age, W, L, W-L%, ERA, G, GS, GF, CG, SHO, SV, IP, H, R, ER, HR, BB...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre><code>## # A tibble: 19 × 35
+##    Year         Age Tm    Lg        W     L `W-L%`   ERA     G    GS    GF    CG
+##    &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 2013          22 PIT   NL       10     7  0.588  3.22    19    19     0     0
+##  2 2014          23 PIT   NL       11     5  0.688  3.65    22    22     0     0
+##  3 2015          24 PIT   NL       19     8  0.704  2.6     32    32     0     0
+##  4 2016          25 PIT   NL        7    10  0.412  3.88    21    21     0     1
+##  5 2017          26 PIT   NL       12    12  0.5    4.26    33    33     0     0
+##  6 2018          27 HOU   AL       15     5  0.75   2.88    32    32     0     1
+##  7 2019          28 HOU   AL       20     5  0.8    2.5     33    33     0     0
+##  8 2020          29 NYY   AL        7     3  0.7    2.84    12    12     0     2
+##  9 2021          30 NYY   AL       16     8  0.667  3.23    30    30     0     2
+## 10 2022          31 NYY   AL        0     0 NA      6.35     3     3     0     0
+## 11 10 Yrs        NA &lt;NA&gt;  &lt;NA&gt;    117    63  0.65   3.22   237   237     0     6
+## 12 162 Game …    NA &lt;NA&gt;  &lt;NA&gt;     17     9  0.65   3.22    34    34     0     1
+## 13 &lt;NA&gt;          NA &lt;NA&gt;  &lt;NA&gt;     NA    NA NA     NA       NA    NA    NA    NA
+## 14 PIT (5 yr…    NA &lt;NA&gt;  &lt;NA&gt;     59    42  0.584  3.5    127   127     0     1
+## 15 NYY (3 yr…    NA &lt;NA&gt;  &lt;NA&gt;     23    11  0.676  3.25    45    45     0     4
+## 16 HOU (2 yr…    NA &lt;NA&gt;  &lt;NA&gt;     35    10  0.778  2.68    65    65     0     1
+## 17 &lt;NA&gt;          NA &lt;NA&gt;  &lt;NA&gt;     NA    NA NA     NA       NA    NA    NA    NA
+## 18 AL (5 yrs)    NA &lt;NA&gt;  &lt;NA&gt;     58    21  0.734  2.91   110   110     0     5
+## 19 NL (5 yrs)    NA &lt;NA&gt;  &lt;NA&gt;     59    42  0.584  3.5    127   127     0     1
+## # … with 23 more variables: SHO &lt;dbl&gt;, SV &lt;dbl&gt;, IP &lt;dbl&gt;, H &lt;dbl&gt;, R &lt;dbl&gt;,
+## #   ER &lt;dbl&gt;, HR &lt;dbl&gt;, BB &lt;dbl&gt;, IBB &lt;dbl&gt;, SO &lt;dbl&gt;, HBP &lt;dbl&gt;, BK &lt;dbl&gt;,
+## #   WP &lt;dbl&gt;, BF &lt;dbl&gt;, `ERA+` &lt;dbl&gt;, FIP &lt;dbl&gt;, WHIP &lt;dbl&gt;, H9 &lt;dbl&gt;,
+## #   HR9 &lt;dbl&gt;, BB9 &lt;dbl&gt;, SO9 &lt;dbl&gt;, `SO/W` &lt;dbl&gt;, Awards &lt;chr&gt;</code></pre>
+<p>That’s how you can grab certain stats from baseball reference!</p>
+</div>
+<div id="hr-by-team-ranked" class="section level2">
+<h2>HR by team, ranked</h2>
+<pre class="r"><code>paths_allowed(&quot;https://www.mlb.com/stats/team/home-runs&quot;)</code></pre>
+<pre><code>## 
+ www.mlb.com</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>Home_Runs_Team &lt;- read_html(&quot;https://www.mlb.com/stats/team/home-runs&quot;)</code></pre>
+<pre class="r"><code>Rank &lt;- Home_Runs_Team %&gt;%
+  html_nodes(&quot;.index-3cdMSKi7&quot;) %&gt;%
+  html_text()
+Rank</code></pre>
+<pre><code>##  [1] &quot;1&quot;  &quot;1&quot;  &quot;2&quot;  &quot;2&quot;  &quot;3&quot;  &quot;3&quot;  &quot;4&quot;  &quot;4&quot;  &quot;4&quot;  &quot;4&quot;  &quot;6&quot;  &quot;6&quot;  &quot;6&quot;  &quot;6&quot;  &quot;8&quot; 
+## [16] &quot;8&quot;  &quot;8&quot;  &quot;8&quot;  &quot;10&quot; &quot;10&quot; &quot;10&quot; &quot;10&quot; &quot;10&quot; &quot;10&quot; &quot;13&quot; &quot;13&quot; &quot;14&quot; &quot;14&quot; &quot;14&quot; &quot;14&quot;
+## [31] &quot;14&quot; &quot;14&quot; &quot;14&quot; &quot;14&quot; &quot;18&quot; &quot;18&quot; &quot;18&quot; &quot;18&quot; &quot;18&quot; &quot;18&quot; &quot;18&quot; &quot;18&quot; &quot;22&quot; &quot;22&quot; &quot;22&quot;
+## [46] &quot;22&quot; &quot;24&quot; &quot;24&quot; &quot;24&quot; &quot;24&quot; &quot;24&quot; &quot;24&quot; &quot;24&quot; &quot;24&quot; &quot;28&quot; &quot;28&quot; &quot;29&quot; &quot;29&quot; &quot;29&quot; &quot;29&quot;</code></pre>
+<pre class="r"><code>Team &lt;- Home_Runs_Team %&gt;%
+  html_nodes(&quot;.full-3fV3c9pF&quot;) %&gt;%
+  html_text()
+Team</code></pre>
+<pre><code>##  [1] &quot;Toronto Blue Jays&quot;     &quot;Los Angeles Angels&quot;    &quot;New York Yankees&quot;     
+##  [4] &quot;Atlanta Braves&quot;        &quot;San Francisco Giants&quot;  &quot;Colorado Rockies&quot;     
+##  [7] &quot;Houston Astros&quot;        &quot;Los Angeles Dodgers&quot;   &quot;Seattle Mariners&quot;     
+## [10] &quot;Minnesota Twins&quot;       &quot;New York Mets&quot;         &quot;Philadelphia Phillies&quot;
+## [13] &quot;Arizona Diamondbacks&quot;  &quot;Chicago White Sox&quot;     &quot;Oakland Athletics&quot;    
+## [16] &quot;San Diego Padres&quot;      &quot;Tampa Bay Rays&quot;        &quot;Chicago Cubs&quot;         
+## [19] &quot;Cleveland Guardians&quot;   &quot;Milwaukee Brewers&quot;     &quot;Texas Rangers&quot;        
+## [22] &quot;Miami Marlins&quot;         &quot;St. Louis Cardinals&quot;   &quot;Boston Red Sox&quot;       
+## [25] &quot;Kansas City Royals&quot;    &quot;Pittsburgh Pirates&quot;    &quot;Washington Nationals&quot; 
+## [28] &quot;Cincinnati Reds&quot;       &quot;Baltimore Orioles&quot;     &quot;Detroit Tigers&quot;</code></pre>
+<p>Slight issue in making a tible in that that the rank counted twice. No idea why that happened. This is an issue I plan to attempt to figure out later. I put together stats on an SPSS file from yesterday’s Dinger Tuesday, so I wish to now run a regression to see what is important to code and run in the future. I am going to first run the model that I initially created in my spreadsheet.</p>
+</div>
+<div id="regression" class="section level2">
+<h2>Regression</h2>
+<pre class="r"><code>library(haven)
+DingerTuesday&lt;- read_sav(&quot;DingerTuesday.sav&quot;)</code></pre>
+<pre class="r"><code>DT_regress_1 &lt;- lm(uHome_Run_Actual ~ Hrx9 + Opp_HR_Rank + Bullpen_Rank + Park_factors + Humidity + Wind_Ranked, data=DingerTuesday)
+
+summary(DT_regress_1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = uHome_Run_Actual ~ Hrx9 + Opp_HR_Rank + Bullpen_Rank + 
+##     Park_factors + Humidity + Wind_Ranked, data = DingerTuesday)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.78711 -0.56399 -0.02559  0.51521  1.86578 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)   0.034252   0.768377   0.045    0.965  
+## Hrx9         -0.172109   0.198586  -0.867    0.395  
+## Opp_HR_Rank  -0.025353   0.021693  -1.169    0.254  
+## Bullpen_Rank  0.011976   0.022389   0.535    0.598  
+## Park_factors  0.390090   0.186725   2.089    0.048 *
+## Humidity      0.011423   0.007637   1.496    0.148  
+## Wind_Ranked   0.117386   0.226409   0.518    0.609  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.948 on 23 degrees of freedom
+## Multiple R-squared:  0.3731, Adjusted R-squared:  0.2095 
+## F-statistic: 2.281 on 6 and 23 DF,  p-value: 0.07123</code></pre>
+<p>Well, that was interesting. It was a small sample size, only one day of games. But only park factors was significant. More data is needed to see if this changes. However, I know there is going to be some factors involving the starting pitchers. Thus, I have decided to look at the data from 2021 and look at the stats of the pitchers who threw the most HRs, and see if we can predict stats of HR heavy pitchers.</p>
+</div>
+<div id="starting-pitchers-2021" class="section level2">
+<h2>Starting Pitchers 2021</h2>
+<p>Now let’s look at the stats of the pitchers last year, and see what could predict their # of HRs. I only took the starting pitchers (relievers wouldn’t be as much use, since we wont know who are going to pitch in relief on a given Tuesady) that had 10 or more starts last year. There were 191 of them.</p>
+<pre class="r"><code>Pitchers_2021 &lt;- read.csv(&quot;2021_Starting_Pitchers.csv&quot;)</code></pre>
+<p>Let’s run a regression, using the stats that could be related to HRs. At first I was going to do HRs, but Innings pitched and Games Played would have too much of an impact on that. Thus, we are going to do HRx9 (home runs by 9 innings)</p>
+<pre class="r"><code>Pitchers_regress1 &lt;- lm(HR9 ~ ERA + H + R + ER + BB + IBB + SO + HBP + WP + ERA. + FIP + WHIP + H9 + SO9 + SO/W, data=Pitchers_2021)
+
+summary(Pitchers_regress1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = HR9 ~ ERA + H + R + ER + BB + IBB + SO + HBP + WP + 
+##     ERA. + FIP + WHIP + H9 + SO9 + SO/W, data = Pitchers_2021)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.093507 -0.023557  0.001612  0.024956  0.095483 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -2.221e+00  5.862e-02 -37.886   &lt;2e-16 ***
+## ERA         -2.183e-02  1.049e-02  -2.081   0.0389 *  
+## H           -2.710e-04  5.271e-04  -0.514   0.6079    
+## R            1.461e-03  1.107e-03   1.319   0.1888    
+## ER           5.881e-04  1.331e-03   0.442   0.6591    
+## BB          -1.096e-03  7.528e-04  -1.455   0.1473    
+## IBB         -2.264e-03  2.235e-03  -1.013   0.3127    
+## SO           3.575e-04  3.331e-04   1.073   0.2846    
+## HBP         -1.528e-02  8.725e-04 -17.513   &lt;2e-16 ***
+## WP           6.569e-04  9.845e-04   0.667   0.5055    
+## ERA.        -4.959e-08  1.432e-04   0.000   0.9997    
+## FIP          6.888e-01  5.970e-03 115.380   &lt;2e-16 ***
+## WHIP        -1.982e+00  8.758e-02 -22.636   &lt;2e-16 ***
+## H9           2.246e-01  1.115e-02  20.138   &lt;2e-16 ***
+## SO9          1.509e-01  4.710e-03  32.035   &lt;2e-16 ***
+## SO:W        -4.889e-06  8.821e-06  -0.554   0.5801    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03479 on 175 degrees of freedom
+##   (309 observations deleted due to missingness)
+## Multiple R-squared:  0.9948, Adjusted R-squared:  0.9943 
+## F-statistic:  2216 on 15 and 175 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Now, I am going to pull a lot of the insignificant variables. Many of these (such as hits and hits by 9) are related, so I wanted to see which would be significant.</p>
+<pre class="r"><code>Pitchers_regress2 &lt;- lm(HR9 ~ ERA + R  + HBP + FIP + WHIP + H9 + SO9, data=Pitchers_2021)
+
+summary(Pitchers_regress2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = HR9 ~ ERA + R + HBP + FIP + WHIP + H9 + SO9, data = Pitchers_2021)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.096216 -0.023836  0.002361  0.026696  0.095405 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -2.2302087  0.0458106 -48.683  &lt; 2e-16 ***
+## ERA         -0.0127753  0.0050385  -2.536   0.0121 *  
+## R            0.0013265  0.0001567   8.467 8.02e-15 ***
+## HBP         -0.0152008  0.0008287 -18.342  &lt; 2e-16 ***
+## FIP          0.6885027  0.0056948 120.899  &lt; 2e-16 ***
+## WHIP        -2.1007507  0.0306337 -68.576  &lt; 2e-16 ***
+## H9           0.2346970  0.0048515  48.376  &lt; 2e-16 ***
+## SO9          0.1557274  0.0023256  66.961  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03441 on 183 degrees of freedom
+##   (309 observations deleted due to missingness)
+## Multiple R-squared:  0.9946, Adjusted R-squared:  0.9944 
+## F-statistic:  4851 on 7 and 183 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>I ran a couple of models, and this one appears to be the best. Now I want to run the same model but see how it predicts HR amount, not just HR/9. Most of the innings should be cotnrolled for by now.</p>
+<pre class="r"><code>Pitchers_regress3 &lt;- lm(HR ~ ERA + R  + HBP + FIP + WHIP + H9 + SO9, data=Pitchers_2021)
+
+summary(Pitchers_regress3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = HR ~ ERA + R + HBP + FIP + WHIP + H9 + SO9, data = Pitchers_2021)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.4110 -0.8757  0.0388  0.8712  7.5199 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -22.822180   2.310540  -9.877  &lt; 2e-16 ***
+## ERA          -2.846712   0.254125 -11.202  &lt; 2e-16 ***
+## R             0.309601   0.007902  39.180  &lt; 2e-16 ***
+## HBP          -0.267418   0.041798  -6.398 1.28e-09 ***
+## FIP           7.924018   0.287230  27.588  &lt; 2e-16 ***
+## WHIP        -27.134198   1.545069 -17.562  &lt; 2e-16 ***
+## H9            2.384435   0.244695   9.745  &lt; 2e-16 ***
+## SO9           1.798780   0.117298  15.335  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.736 on 183 degrees of freedom
+##   (309 observations deleted due to missingness)
+## Multiple R-squared:  0.9369, Adjusted R-squared:  0.9345 
+## F-statistic:   388 on 7 and 183 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Very similar, almost no change. Not surprising. I just wanted to see it. These numbers should accurately predict someone HRx9. Maybe i should find another dataset of more advanced statistics… hmmm. Theres so many, it would take forever to play with all of them.</p>
+<p>An interesting thing in the above models were that ERA was significant, but ERA+ (earned run average adjusted to players ballparks) is not significant. That shows what we found earlier, that ballparks do matter. Unfortunately baseball reference does not have HRs by ballpark anywhere. I did find another site listing them, so I could try and combine that information. Either way, lots of directions to go from here, and I think this was a good start.</p>
 </div>
 
 

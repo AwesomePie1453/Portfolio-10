@@ -17,55 +17,140 @@ Fanduel Sportsbook does a promotion every Tuesday called Dinger Tuesday. Bet $25
 
 To do this, we are going to try and webscrape baseball reference. 
 
-```{r load}
+```{r load1}
 library(tidyverse)
 library(rvest)
 library(skimr)
 library(robotstxt)
 ```
 
-```{r}
+```{r refer}
 paths_allowed("www.baseball-reference.com")
 ```
 
-```{r}
+```{r cole}
 Gerrit_Cole <- read_html("https://www.baseball-reference.com/players/c/colege01.shtml")
 typeof(Gerrit_Cole)
 ```
 
-```{r}
+```{r year} 
 year <- Gerrit_Cole %>%
   html_nodes(".full th") %>%
   html_text()
 year
 ```
 
-```{r}
-Team <- Gerrit_Cole %>%
-  html_nodes("#pitching_standard .right+ .left") %>%
-  html_text()
-Team
-```
 
-```{r}
+```{r ERA}
 ERA <- Gerrit_Cole %>%
   html_nodes(".right.poptip:nth-child(8)") %>%
   html_text()
 ERA
 ```
 
-```{r}
+```{r IP}
 IP <- Gerrit_Cole %>%
   html_nodes(".full .poptip.iz+ .right") %>%
   html_text()
 IP
 ```
 
-```{r}
+```{r tibble}
 GerritCole <- tibble(
   year = year,
   ERA = ERA,
   Innings_Pitched = IP 
 )
 ```
+
+Comparing to just using the sheet
+
+```{r sheet}
+read_csv("Gerrit Cole Stats.csv")
+```
+That's how you can grab certain stats from baseball reference!
+
+## HR by team, ranked
+
+```{r mlballow}
+paths_allowed("https://www.mlb.com/stats/team/home-runs")
+```
+
+
+```{r hrt} 
+Home_Runs_Team <- read_html("https://www.mlb.com/stats/team/home-runs")
+```
+
+
+
+```{r rank}
+Rank <- Home_Runs_Team %>%
+  html_nodes(".index-3cdMSKi7") %>%
+  html_text()
+Rank
+```
+
+```{r team}
+Team <- Home_Runs_Team %>%
+  html_nodes(".full-3fV3c9pF") %>%
+  html_text()
+Team
+```
+
+
+
+Slight issue in making a tible in that that the rank counted twice. No idea why that happened. This is an issue I plan to attempt to figure out later. I put together stats on an SPSS file from yesterday's Dinger Tuesday, so I wish to now run a regression to see what is important to code and run in the future. I am going to first run the model that I initially created in my spreadsheet.
+
+## Regression
+
+```{r load}
+library(haven)
+DingerTuesday<- read_sav("DingerTuesday.sav")
+```
+
+
+```{r regression}
+DT_regress_1 <- lm(uHome_Run_Actual ~ Hrx9 + Opp_HR_Rank + Bullpen_Rank + Park_factors + Humidity + Wind_Ranked, data=DingerTuesday)
+
+summary(DT_regress_1)
+```
+
+Well, that was interesting. It was a small sample size, only one day of games. But only park factors was significant. More data is needed to see if this changes. However, I know there is going to be some factors involving the starting pitchers. Thus, I have decided to look at the data from 2021 and look at the stats of the pitchers who threw the most HRs, and see if we can predict stats of HR heavy pitchers. 
+
+
+## Starting Pitchers 2021
+
+Now let's look at the stats of the pitchers last year, and see what could predict their # of HRs. I only took the starting pitchers (relievers wouldn't be as much use, since we wont know who are going to pitch in relief on a given Tuesady) that had 10 or more starts last year. There were 191 of them.
+
+```{r bball}
+Pitchers_2021 <- read.csv("2021_Starting_Pitchers.csv")
+```
+
+Let's run a regression, using the stats that could be related to HRs. At first I was going to do HRs, but Innings pitched and Games Played would have too much of an impact on that. Thus, we are going to do HRx9 (home runs by 9 innings)
+
+```{r pitch}
+Pitchers_regress1 <- lm(HR9 ~ ERA + H + R + ER + BB + IBB + SO + HBP + WP + ERA. + FIP + WHIP + H9 + SO9 + SO/W, data=Pitchers_2021)
+
+summary(Pitchers_regress1)
+```
+
+Now, I am going to pull a lot of the insignificant variables. Many of these (such as hits and hits by 9) are related, so I wanted to see which would be significant. 
+
+```{r pitch2}
+Pitchers_regress2 <- lm(HR9 ~ ERA + R  + HBP + FIP + WHIP + H9 + SO9, data=Pitchers_2021)
+
+summary(Pitchers_regress2)
+```
+
+I ran a couple of models, and this one appears to be the best. Now I want to run the same model but see how it predicts HR amount, not just HR/9. Most of the innings should be cotnrolled for by now. 
+
+```{r pitch3}
+Pitchers_regress3 <- lm(HR ~ ERA + R  + HBP + FIP + WHIP + H9 + SO9, data=Pitchers_2021)
+
+summary(Pitchers_regress3)
+```
+
+Very similar, almost no change. Not surprising. I just wanted to see it. These numbers should accurately predict someone HRx9. Maybe i should find another dataset of more advanced statistics... hmmm. Theres so many, it would take forever to play with all of them. 
+
+An interesting thing in the above models were that ERA was significant, but ERA+ (earned run average adjusted to players ballparks) is not significant. That shows what we found earlier, that ballparks do matter. Unfortunately baseball reference does not have HRs by ballpark anywhere. I did find another site listing them, so I could try and combine that information. Either way, lots of directions to go from here, and I think this was a good start.
 
